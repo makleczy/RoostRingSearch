@@ -22,11 +22,11 @@
 
 
 """
-Python 3 package for finding swallow roost rings on US weather surveillance radar 
+Python 3 package for finding swallow roost rings on US weather surveillance radar
 
 Dependencies
 ------------
-arm-pyart 1.12.1
+arm-pyart 1.14.1
 astral 2.2  
 boto3 1.21.43  
 botocore 1.24.43 
@@ -98,6 +98,7 @@ from pytz import timezone
 from timezonefinder import TimezoneFinder
 
 import tempfile
+import warnings
 
 
 ####################
@@ -416,8 +417,8 @@ def get_ring_center_coords(ring_center_pixel_arrays, station_str, display_output
         ax.set_xlim(0, len(bool_signal_array))
         ax.set_ylim(len(bool_signal_array), 0)
         
-        ax.set_xlabel('East West Distance from Radar (km)', fontsize = 12)
-        ax.set_ylabel('North South Distance from Radar (km)', fontsize = 12)
+        ax.set_xlabel('Distance (km)', fontsize = 12)
+        ax.set_ylabel('Distance (km)', fontsize = 12)
         ax.set_title('Potential Roost Ring Centers', fontsize = 12)
         
         plt.show()
@@ -637,10 +638,18 @@ def prefix_to_scan_pyart(prefix_str, display_output = False):
             
         # want the code to keep running and move on to the next scan if there's a pyart error
         try:
-            scan_pyart = pyart.io.read_nexrad_archive(temp_nexrad_file)    
-        except (OSError, IndexError, ValueError) as pyart_error:  
+            with warnings.catch_warnings(record = True) as pyart_warning:
+                
+                scan_pyart = pyart.io.read_nexrad_archive(temp_nexrad_file)  
+                
+                if len(pyart_warning) > 0:
+                    warning_message = str(pyart_warning[0].message)
+                    if "fixed angle data will be missing" in warning_message:
+                        print("Warning: Fixed angle data missing")
+                
+        except (OSError, IndexError, ValueError) as pyart_error:
             if display_output:
-                print('pyart error:', pyart_error, '- no analysis for', title_str.replace('\n', ' '))
+                print('pyart error:', pyart_error, '- no analysis for:', prefix_str)
             return []
         
     return scan_pyart
@@ -661,11 +670,15 @@ def get_scan_field_str(scan_pyart):
         Nicely formatted reflectivity label including scan angle
     """
     
+    scan_field_str = scan_pyart.fields['reflectivity']['long_name']
+    
     scan_angle = scan_pyart.fixed_angle['data'][0]
-    scan_angle_units = scan_pyart.fixed_angle['units']
-    scan_angle_str = ' (%1.1f %s)'%(scan_angle, scan_angle_units)
-    scan_angle_str = scan_angle_str.replace(' d', ' D')
-    scan_field_str = scan_pyart.fields['reflectivity']['long_name'] + scan_angle_str
+    
+    if scan_angle > 0:
+        scan_angle_units = scan_pyart.fixed_angle['units']
+        scan_angle_str = ' (%1.1f %s)'%(scan_angle, scan_angle_units)
+        scan_angle_str = scan_angle_str.replace(' d', ' D')
+        scan_field_str = scan_field_str + scan_angle_str
     
     return scan_field_str
 
@@ -686,7 +699,6 @@ def get_single_product_array(scan_pyart, cutoff_distance, field_name):
     scan_pyart : pyart scan object
     cutoff_distance : int, optional
         Restrict to x and y within cutoff_distance km from the radar station
-        Default: cutoff_distance = 150
     field_name : string
         'reflectivity', 'clutter_filter_power_removed', or 'cross_correlation_ratio'
 
@@ -946,8 +958,8 @@ def hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, 
     cbar.set_label(label = 'Equivalent Reflectivity Factor (dBZ)', fontsize = 12)
     cbar.ax.tick_params(labelsize = 12)
     
-    ax[0].set_xlabel('East West Distance from Radar (km)', fontsize = 12)
-    ax[0].set_ylabel('North South Distance from Radar (km)', fontsize = 12)
+    ax[0].set_xlabel('Distance (km)', fontsize = 12)
+    ax[0].set_ylabel('Distance (km)', fontsize = 12)
     ax[0].set_title(scan_field_str, fontsize = 12)
     
     original_ticks = [50*i for i in range(1, 2*cutoff_distance//50)]
@@ -964,8 +976,8 @@ def hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, 
     if len(center_coords) > 0:
         ax[1].scatter(center_coords[:, 0] + cutoff_distance, cutoff_distance - center_coords[:, 1], c = 'gold', edgecolor = 'k', s = 25, linewidth = 1.75) 
     
-    ax[1].set_xlabel('East West Distance from Radar (km)', fontsize = 12)
-    ax[1].set_ylabel('North South Distance from Radar (km)', fontsize = 12)
+    ax[1].set_xlabel('Distance (km)', fontsize = 12)
+    ax[1].set_ylabel('Distance (km)', fontsize = 12)
     
     results_title = 'Potential Roost Rings'
     ax[1].set_title(results_title, fontsize = 12)
