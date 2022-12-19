@@ -42,7 +42,6 @@ timezonefinder 5.2.0
 Main functions
 --------------
 find_roost_rings
-get_ring_center_coords
 morning_exodus
 
 Additional functions
@@ -51,6 +50,7 @@ empty_roost_df
 get_example
 get_localtime_str
 get_radar_arrays
+get_ring_center_coords
 get_scan_dts_in_window
 get_scan_field_str
 get_single_product_array
@@ -324,6 +324,12 @@ def find_roost_rings(station_str,
             "results mask": results_mask, 
             "ring center pixels": ring_center_pixels, 
             "reflectivity scan time": refl0_scan_time}
+
+
+####################
+
+
+# get coordinates of ring centers
 
 
 def get_ring_center_coords(ring_center_pixel_arrays, station_str, display_output = False, figure_length = 6):    
