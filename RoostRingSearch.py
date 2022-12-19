@@ -24,21 +24,6 @@
 """
 Python 3 package for finding swallow roost rings on US weather surveillance radar
 
-Dependencies
-------------
-arm-pyart 1.14.1
-astral 2.2  
-boto3 1.21.43  
-botocore 1.24.43 
-haversine 2.5.1
-matplotlib 3.5.1
-numpy 1.22.3
-pandas 1.4.2
-pytz 2022.1
-scikit-image 0.19.2
-scipy 1.8.0
-timezonefinder 5.2.0
-
 Main functions
 --------------
 find_roost_rings
@@ -63,6 +48,21 @@ near_sunrise_time
 no_files_that_day
 prefix_to_scan_pyart
 single_filter_sweep
+
+Dependencies
+------------
+arm-pyart 1.14.1
+astral 2.2  
+boto3 1.21.43  
+botocore 1.24.43 
+haversine 2.5.1
+matplotlib 3.5.1
+numpy 1.22.3
+pandas 1.4.2
+pytz 2022.1
+scikit-image 0.19.2
+scipy 1.8.0
+timezonefinder 5.2.0
 """
 
 
@@ -905,7 +905,7 @@ def single_filter_sweep(radar_bool_allcorr, radar_bool_lowcorr, max_background_n
     all_conditions = np.logical_and(condition1, condition2)    
     
     ring_center_pixels = 1 * all_conditions
-    possible_rings = np.zeros(np.shape(radar_bool_lowcorr))
+    possible_rings = np.zeros(np.shape(radar_bool_allcorr))
         
     center_is, center_js = np.nonzero(ring_center_pixels)
     for (center_i, center_j) in zip(center_is, center_js):
@@ -913,7 +913,7 @@ def single_filter_sweep(radar_bool_allcorr, radar_bool_lowcorr, max_background_n
         i = center_i - center_distance
         j = center_j - center_distance
         
-        in_ring_signal = np.multiply(positive_filter, radar_bool_lowcorr[i:i+filter_dim, j:j+filter_dim])
+        in_ring_signal = np.multiply(positive_filter, radar_bool_allcorr[i:i+filter_dim, j:j+filter_dim])
         possible_rings[i:i+filter_dim, j:j+filter_dim] = np.maximum(possible_rings[i:i+filter_dim, j:j+filter_dim], in_ring_signal)  
    
     return [ring_center_pixels, possible_rings]
