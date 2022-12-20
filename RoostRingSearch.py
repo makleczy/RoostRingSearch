@@ -163,11 +163,11 @@ def morning_exodus(station_str,
     
     all_times_ring_center_pixels = []
     reflectivity_scan_times = []
+    reflectivity_scan_prefixes = []
     
     for scan_dt in valid_scan_dts:
 
-        search_output = find_roost_rings(station_str, 
-                                         scan_dt, 
+        search_output = find_roost_rings((station_str, scan_dt), 
                                          cutoff_distance = cutoff_distance, 
                                          min_reflectivity = min_reflectivity, 
                                          max_background_noise = max_background_noise, 
@@ -177,6 +177,7 @@ def morning_exodus(station_str,
         if search_output["success"]:
             all_times_ring_center_pixels += [search_output["ring center pixels"]]
             reflectivity_scan_times += [search_output["reflectivity scan time"]]
+            reflectivity_scan_prefixes += [search_output["scan prefix"]]
 
     if len(all_times_ring_center_pixels) > 0:
         
@@ -193,6 +194,7 @@ def morning_exodus(station_str,
             latlon_coord_df['year'] = [scan_date[0]] * n_rings_found
             latlon_coord_df['month'] = [scan_date[1]] * n_rings_found
             latlon_coord_df['day'] = [scan_date[2]] * n_rings_found
+            latlon_coord_df['scan prefix'] = np.array(reflectivity_scan_prefixes)[ring_center_coords["first scan indices"]]
 
             return latlon_coord_df
         
@@ -205,8 +207,7 @@ def morning_exodus(station_str,
         return empty_roost_df()
 
 
-def find_roost_rings(station_str,
-             scan_dt,
+def find_roost_rings(scan_info,
              cutoff_distance = 150,
             
              # parameters
@@ -224,10 +225,11 @@ def find_roost_rings(station_str,
     
     Parameters
     ----------
-    station_str : string
-        Four letter identifier for the radar station
-    scan_dt : datetime
-        Date and time of the requested scan
+    scan_info : tuple or string
+        Option 1: tuple of the form (station_str, scan_dt) where 
+                  station_str (string) is the four letter identifier for the radar station and
+                  scan_dt (datetime) is the date and time of the requested scan
+        Option 2: string in the format of the output of make_prefix_str
     cutoff_distance : int, optional
         Restrict to x and y within cutoff_distance km from the radar station
         Default: cutoff_distance = 150
@@ -269,11 +271,25 @@ def find_roost_rings(station_str,
         Array elements which could correspond to the center of a roost ring
     reflectivity scan time : string
         Date and time of reflectivity scan in format to be easily converted to a posix
+    scan prefix : string
+        File prefix for the given scan
     """
 
-    ### get scan info
+    ### get scan information
+    
+    if type(scan_info) == tuple:
+        (station_str, scan_dt) = scan_info
+        scan_prefix = make_prefix_str(station_str, scan_dt)
+    elif type(scan_info) == str:
+        [year_str, month_str, day_str, station_str, long_str] = scan_info.split('/')
+        hour_str = long_str[-4:-2]
+        minute_str = long_str[-2:]
+        scan_dt = datetime.datetime(int(year_str), int(month_str), int(day_str), int(hour_str), int(minute_str))
+        scan_prefix = scan_info
+    else:
+        print('Error - incorrect input format')
+        return {"success": False}
        
-    scan_prefix = make_prefix_str(station_str, scan_dt)
     scan_pyart = prefix_to_scan_pyart(scan_prefix, display_output = display_output)
     if scan_pyart == []:  # there was an error trying to access that scan
         return {"success": False}
@@ -323,7 +339,8 @@ def find_roost_rings(station_str,
             "fill value": fill_value, 
             "results mask": results_mask, 
             "ring center pixels": ring_center_pixels, 
-            "reflectivity scan time": refl0_scan_time}
+            "reflectivity scan time": refl0_scan_time,
+            "scan prefix": scan_prefix}
 
 
 ####################
@@ -1070,7 +1087,7 @@ def empty_roost_df():
     Returns empty DataFrame with same column names as output when roost rings are found.
     """
     
-    return pd.DataFrame(columns = ['latitude', 'longitude', 'first detection', 'station name', 'year', 'month', 'day'])
+    return pd.DataFrame(columns = ['latitude', 'longitude', 'first detection', 'station name', 'year', 'month', 'day', 'scan prefix'])
 
 
 def no_files_that_day(station_str, scan_date):
