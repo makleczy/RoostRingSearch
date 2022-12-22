@@ -87,7 +87,7 @@ morning_df
 
 If everything is set up correctly, you should see something like this:
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/readme_df.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/readme_df.png" width = "700">
 
 RoostRingSearch checked all the available scans from the KDOX radar during a window of time on the morning of August 23, 2020. It found four distinct roost rings and reported the latitude and longitude of the center of each ring, as well as the scan on which each ring was first detected.
 
@@ -101,11 +101,11 @@ for scan_prefix in np.unique(morning_df['scan prefix']):
     rrs.find_roost_rings(scan_prefix, display_output = True)
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_intro0.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_intro0.png" width = "700">
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_intro1.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_intro1.png" width = "700">
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_intro2.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_intro2.png" width = "700">
 
 RoostRingSearch isn't perfect - it missed some roost rings on the middle scan! But it did a better job on the next scan. RoostRingSearch will make some mistakes, but it is a helpful tool if you would like an overview of roost ring locations without having to check all the scans manually.
 
@@ -121,7 +121,7 @@ To check this scan for roost rings, run
 rrs.find_roost_rings('2021/08/10/KDOX/KDOX20210810_1015', display_output = True);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_array_processing.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_array_processing.png" width = "700">
 
 RoostRingSearch looks for roost rings in the reflectivity data. There is a lot of material on the reflectivity scan besides just roost rings. Some preprocessing helps clean up the array. RoostRingSearch performs the following preprocessing steps:
 
@@ -131,7 +131,7 @@ RoostRingSearch looks for roost rings in the reflectivity data. There is a lot o
 
 Here's what the reflectivity, clutter_filter_power_removed, and cross_correlation_ratio look like for this scan:
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/readme_3fields.jpg" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/readme_3fields.jpg" width = "700">
 
 RoostRingSearch can look for roost rings using only reflectivity data, but it doesn't perform as well. For example, precipitation can form shapes that are close enough to rings to be flagged as possible roost rings.
 
@@ -168,7 +168,7 @@ This parameter controls the region of the original scan which `find_roost_rings`
 rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35)), display_output = True);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_cutoff_default.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_cutoff_default.png" width = "700">
 
 To find that roost ring, increase the default value of `cutoff_distance` to 200:
 
@@ -176,11 +176,11 @@ To find that roost ring, increase the default value of `cutoff_distance` to 200:
 rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35)), display_output = True, cutoff_distance = 200);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_cutoff_200.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_cutoff_200.png" width = "700">
 
 Increasing the `cutoff_distance` creates larger arrays, which can increase the run time. Also, the data quality starts to decrease for large values of `cutoff_distance`. This scan demonstrates that if you increase the `cutoff_distance` to 250, the cross_correlation_ratio isn't available for the whole array. RoostRingSearch uses the cross_correlation_ratio to identify precipitation, so there can be more false positives due to precipitation in the corners of scans if you choose a `cutoff_distance` of 250 km.
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/readme_cutoff_precip.jpg" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/readme_cutoff_precip.jpg" width = "700">
 
 A scan such as this one can have a lot of precipitation, and still have a roost ring.
 
@@ -188,7 +188,7 @@ A scan such as this one can have a lot of precipitation, and still have a roost 
 rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 4, 9, 41)), display_output = True);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_cutoff_precip.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_cutoff_precip.png" width = "700">
 
 #### min_reflectivity
 
@@ -198,7 +198,7 @@ Recall that one of the preprocessing steps is to screen out low reflectivity. Th
 rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20)), display_output = True);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minrefl_default.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minrefl_default.png" width = "700">
 
 Increasing the `min_reflectivity` to 10 finds two of the other rings instead, because they have higher reflectivity in the ring region and the noisy reflectivity in the background is screened out.
 
@@ -206,7 +206,7 @@ Increasing the `min_reflectivity` to 10 finds two of the other rings instead, be
 rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20)), display_output = True, min_reflectivity = 10);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minrefl_10.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minrefl_10.png" width = "700">
 
 Running the function multiple times with different values of `min_reflectivity` would find more roost rings, but at the cost of increased processing time. This could also increase the number of false positives (identifying something as a potential roost ring when it's really not a roost ring).
 
@@ -218,7 +218,7 @@ Remember the linear filter? A roost ring should not have too much reflectivity i
 rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_output = True);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_background_default.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_background_default.png" width = "700">
 
 `find_roost_rings` is able to find this roost ring when `max_background_noise = 0.15`. Note that increasing the `max_background_noise` makes it easier for a region of a scan to count as a roost ring, so in general there will be more false positives.
 
@@ -226,7 +226,7 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_out
 rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_output = True, max_background_noise = 0.15);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_background_015.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_background_015.png" width = "700">
 
 #### min_signal
 
@@ -236,7 +236,7 @@ Finally, the `min_signal` parameter determines how much reflectivity is needed i
 rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59)), display_output = True);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minsignal_default.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minsignal_default.png" width = "700">
 
 Decreasing the `min_signal` parameter to 0.25 relaxes the requirements enough to find this roost ring. As before, this makes false positive results more likely.
 
@@ -244,7 +244,7 @@ Decreasing the `min_signal` parameter to 0.25 relaxes the requirements enough to
 rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59)), display_output = True, min_signal = 0.25);
 ```
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minsignal_025.png" width = "600">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minsignal_025.png" width = "700">
 
 ### More info
 
