@@ -433,8 +433,8 @@ def get_ring_center_coords(ring_center_pixel_arrays, station_str, display_output
         original_ticks = [50*i for i in range(1, 2*cutoff_distance//50)]
         new_xticks = [tick - cutoff_distance for tick in original_ticks]
         new_yticks = [cutoff_distance - tick for tick in original_ticks]
-        ax.set_xticks(original_ticks, new_xticks)
-        ax.set_yticks(original_ticks, new_yticks)
+        ax.set_xticks(original_ticks, labels = new_xticks)
+        ax.set_yticks(original_ticks, labels = new_yticks)
         ax.tick_params(labelsize = 12)
         
         ax.set_xlim(0, len(bool_signal_array))
@@ -988,8 +988,8 @@ def hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, 
     original_ticks = [50*i for i in range(1, 2*cutoff_distance//50)]
     new_xticks = [tick - cutoff_distance for tick in original_ticks]
     new_yticks = [cutoff_distance - tick for tick in original_ticks]
-    ax[0].set_xticks(original_ticks, new_xticks)
-    ax[0].set_yticks(original_ticks, new_yticks)
+    ax[0].set_xticks(original_ticks, labels = new_xticks)
+    ax[0].set_yticks(original_ticks, labels = new_yticks)
     ax[0].tick_params(labelsize = 12)
     
     ### plot the results
@@ -1005,8 +1005,8 @@ def hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, 
     results_title = 'Potential Roost Rings'
     ax[1].set_title(results_title, fontsize = 12)
     
-    ax[1].set_xticks(original_ticks, new_xticks)
-    ax[1].set_yticks(original_ticks, new_yticks)
+    ax[1].set_xticks(original_ticks, labels = new_xticks)
+    ax[1].set_yticks(original_ticks, labels = new_yticks)
     ax[1].tick_params(labelsize = 12)
     
     plt.subplots_adjust(wspace = 0.05)
