@@ -173,7 +173,8 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35)), display_ou
 To find that roost ring, increase the default value of `cutoff_distance` to 200:
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35)), display_output = True, cutoff_distance = 200);
+rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35)), display_output = True, 
+                      cutoff_distance = 200);
 ```
 
 <img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_cutoff_200.png" width = "700">
@@ -203,7 +204,8 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20)), display_o
 Increasing the `min_reflectivity` to 10 finds two of the other rings instead, because they have higher reflectivity in the ring region and the noisy reflectivity in the background is screened out.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20)), display_output = True, min_reflectivity = 10);
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20)), display_output = True, 
+                      min_reflectivity = 10);
 ```
 
 <img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minrefl_10.png" width = "700">
@@ -223,7 +225,8 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_out
 `find_roost_rings` is able to find this roost ring when `max_background_noise = 0.15`. Note that increasing the `max_background_noise` makes it easier for a region of a scan to count as a roost ring, so in general there will be more false positives.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_output = True, max_background_noise = 0.15);
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_output = True, 
+                      max_background_noise = 0.15);
 ```
 
 <img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_background_015.png" width = "700">
@@ -241,7 +244,8 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59)), display_ou
 Decreasing the `min_signal` parameter to 0.25 relaxes the requirements enough to find this roost ring. As before, this makes false positive results more likely.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59)), display_output = True, min_signal = 0.25);
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59)), display_output = True, 
+                      min_signal = 0.25);
 ```
 
 <img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minsignal_025.png" width = "700">
