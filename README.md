@@ -86,7 +86,7 @@ If you plan on using Google Colab, run the following line to install any package
 pip install --upgrade arm-pyart astral boto3 haversine matplotlib timezonefinder
 ```
 
-Then restart the runtime. Upload the RoostRingSearch.py file to "Files" on the left side of the page.
+Then restart the runtime. Upload the RoostRingSearch.py file to "Files" on the left side of the page. Run the imports listed above.
 
 ### Basic use
 
