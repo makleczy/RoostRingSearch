@@ -45,6 +45,8 @@ Python 3 package for finding swallow roost rings on US weather surveillance rada
 
 ## Selected resources
 
+[Birds on weather radar](https://birdcast.info/about/weather-surveillance-radar-and-bird-migration-primer/)
+
 There are many excellent resources describing the use of weather radar data for monitoring birds and other animals in the airspace. I won't list all of them here, but I'll point out three in particular which were important in the development of this package.
 
 The paper [Unlocking the Potential of NEXRAD Data through NOAA’s Big Data Partnership](https://journals.ametsoc.org/view/journals/bams/99/1/bams-d-16-0021.1.xml) discusses efforts to make the necessary data openly available.
