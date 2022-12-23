@@ -45,7 +45,7 @@ Python 3 package for finding swallow roost rings on US weather surveillance rada
 
 ## Selected resources
 
-[Birds on weather radar](https://birdcast.info/about/weather-surveillance-radar-and-bird-migration-primer/)
+If you're not familiar with roost rings and would like a fun introduction, you can read about [birds on weather radar](https://birdcast.info/about/weather-surveillance-radar-and-bird-migration-primer/).
 
 There are many excellent resources describing the use of weather radar data for monitoring birds and other animals in the airspace. I won't list all of them here, but I'll point out three in particular which were important in the development of this package.
 
@@ -69,7 +69,7 @@ Run
 import RoostRingSearch as rrs
 ```
 
-and you should be all set! You may see some deprecation warnings, but that's okay.
+and you should be all set!
 
 If you're following along with the code in this readme, you'll also need to run
 
@@ -77,6 +77,16 @@ If you're following along with the code in this readme, you'll also need to run
 import numpy as np
 import datetime
 ```
+
+#### Google Colaboratory 
+
+If you plan on using Google Colab, run the following line to install any packages that aren't automatically included.
+
+```
+pip install --upgrade arm-pyart astral boto3 haversine matplotlib timezonefinder
+```
+
+Then restart the runtime. Upload the RoostRingSearch.py file to "Files" on the left side of the page.
 
 ### Basic use
 
