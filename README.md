@@ -300,7 +300,7 @@ Run `?rrs` to see some basic information about RoostRingSearch, including a list
 
 ## Documenting use
 
-Kleczynski, M., Bird, K., Giusti, C., & Buler, J. (2022). RoostRingSearch (Version 1.0) [Computer software]. https://github.com/makleczy/RoostRingSearch
+Kleczynski, M., Bird, K., Giusti, C., & Buler, J. (2022). RoostRingSearch (Version 1.1) [Computer software]. https://github.com/makleczy/RoostRingSearch
 
 @software{RoostRingSearch,
 <br>
@@ -312,7 +312,7 @@ title = {{RoostRingSearch}},
 <br>
 url = {https://github.com/makleczy/RoostRingSearch},
 <br>
-version = {v1.0},
+version = {v1.1},
 <br>
 year = {2022}
 <br>
