@@ -183,18 +183,29 @@ def morning_exodus(station_str,
         
         ring_center_coords = get_ring_center_coords(all_times_ring_center_pixels, station_str, display_output = display_output)
         center_coords_latlon = ring_center_coords["center coords (lat/lon)"]
+        center_coords_index = ring_center_coords["center coords (index)"]
         
         n_rings_found = len(center_coords_latlon)
 
         if n_rings_found > 0:
             
-            latlon_coord_df = pd.DataFrame(center_coords_latlon, columns = ['latitude', 'longitude'])
+            latlon_coord_df = pd.DataFrame(center_coords_latlon, columns = ['center (latitude)', 'center (longitude)'])
+            latlon_coord_df['center (array x)'] = center_coords_index[:, 1]
+            latlon_coord_df['center (array y)'] = center_coords_index[:, 0]
+            latlon_coord_df['min xlim'] = ring_center_coords["min xlims"]
+            latlon_coord_df['max xlim'] = ring_center_coords["max xlims"]
+            latlon_coord_df['min ylim'] = ring_center_coords["min ylims"]
+            latlon_coord_df['max ylim'] = ring_center_coords["max ylims"]
             latlon_coord_df['first detection'] = np.array(reflectivity_scan_times)[ring_center_coords["first scan indices"]]
             latlon_coord_df['station name'] = [station_str] * n_rings_found
             latlon_coord_df['year'] = [scan_date[0]] * n_rings_found
             latlon_coord_df['month'] = [scan_date[1]] * n_rings_found
             latlon_coord_df['day'] = [scan_date[2]] * n_rings_found
             latlon_coord_df['scan prefix'] = np.array(reflectivity_scan_prefixes)[ring_center_coords["first scan indices"]]
+            latlon_coord_df['cutoff_distance'] = [cutoff_distance] * n_rings_found
+            latlon_coord_df['min_reflectivity'] = [min_reflectivity] * n_rings_found
+            latlon_coord_df['max_background_noise'] = [max_background_noise] * n_rings_found
+            latlon_coord_df['min_signal'] = [min_signal] * n_rings_found
 
             return latlon_coord_df
         
@@ -331,7 +342,7 @@ def find_roost_rings(scan_info,
 
         scan_field_str = get_scan_field_str(scan_pyart)
         
-        hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, results_mask, ring_center_coords["center coords (km)"], figure_length, filename_suffix)
+        hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, results_mask, ring_center_coords["center coords (index)"], figure_length, filename_suffix)
     
     return {"success": True, 
             "latlon coords": ring_center_coords["center coords (lat/lon)"], 
@@ -349,14 +360,15 @@ def find_roost_rings(scan_info,
 # get coordinates of ring centers
 
 
-def get_ring_center_coords(ring_center_pixel_arrays, station_str, display_output = False, figure_length = 6):    
+def get_ring_center_coords(center_radius_pixel_arrays, station_str, display_output = False, figure_length = 6):    
     
     """ We already marked pixels which are likely the center of a roost ring. It is possible that several "center" pixels were identified for a single roost ring. They may not form a single connected component if the shape of that roost ring irregular. So we apply dilation to hopefully form one connected component for the center of each roost ring. We use that to determine a location for each roost ring.
     
     Parameters
     ----------
-    ring_center_pixel_arrays : list of arrays
-        Array values of 1 indicate that a roost ring could be centered there
+    center_radius_pixel_arrays : list of arrays
+        Positive array values indicate that a roost ring could be centered there
+        Array value is the maximum radius of the filter for which a ring was identified
     station_str : string
         Four letter identifier for the radar station
     display_output : bool, optional
@@ -377,16 +389,24 @@ def get_ring_center_coords(ring_center_pixel_arrays, station_str, display_output
         Latitude and longitude of centers of potential roost rings
     first scan indices : array
         First scan where each ring was seen
+    "min xlims" : array
+        Plot limits for the part of the reflectivity array containing each ring
+    "max xlims" : array
+        Plot limits for the part of the reflectivity array containing each ring
+    "min ylims" : array
+        Plot limits for the part of the reflectivity array containing each ring
+    "max ylims" : array
+        Plot limits for the part of the reflectivity array containing each ring
     """
     
     station_lat, station_lon = get_station_latlon(station_str)
     
+    ring_center_pixel_arrays = [1 * (crp_array > 0) for crp_array in center_radius_pixel_arrays]
     n_arrays = len(ring_center_pixel_arrays)
     array_dim = np.shape(ring_center_pixel_arrays[0])[0]
     cutoff_distance = (array_dim - 1) // 2
     
     min_timestamps = np.zeros((array_dim, array_dim), dtype = np.int64)
-    
     # don't use 0 as a timestamp, because it's the background value - so timestamps are offset by 1 from indices
     for i in range(array_dim):
         for j in range(array_dim):
@@ -399,11 +419,15 @@ def get_ring_center_coords(ring_center_pixel_arrays, station_str, display_output
     
     labeled_centers, max_label = label(dilation(bool_signal_array, disk(3)), return_num = True)   
     
-    first_scan_indices = np.zeros(max_label, dtype = np.int64)
+    first_scan_indices = np.zeros(max_label, dtype = int)
+    min_xlims = np.zeros(max_label, dtype = int)
+    max_xlims = np.zeros(max_label, dtype = int)
+    min_ylims = np.zeros(max_label, dtype = int)
+    max_ylims = np.zeros(max_label, dtype = int)
     center_coords_index = np.zeros((0, 2))
 
     for label_iter in range(1, max_label + 1):
-
+        
         timestamped_center = min_timestamps * (labeled_centers == label_iter)
         possible_timestamps = np.unique(timestamped_center)
         possible_timestamps = [pt for pt in possible_timestamps if pt > 0]
@@ -411,6 +435,16 @@ def get_ring_center_coords(ring_center_pixel_arrays, station_str, display_output
         min_timestamp_center = (timestamped_center == min_timestamp)
         center_coords_index = np.vstack([center_coords_index, ndimage.center_of_mass(min_timestamp_center)])
         first_scan_indices[label_iter - 1] = min_timestamp - 1
+        
+        ##### could be getting max rad from a different scan - use the first scan index to get the right max rad array
+        
+        max_radii_center = center_radius_pixel_arrays[min_timestamp - 1] * (labeled_centers == label_iter)
+        thisring_maxrad = np.max(max_radii_center)
+        thisring_centerys, thisring_centerxs = np.where(max_radii_center > 0)  # rows -> y, columns -> x
+        min_xlims[label_iter - 1] = min(thisring_centerxs) - thisring_maxrad - 1
+        max_xlims[label_iter - 1] = max(thisring_centerxs) + thisring_maxrad + 1
+        min_ylims[label_iter - 1] = min(thisring_centerys) - thisring_maxrad - 1
+        max_ylims[label_iter - 1] = max(thisring_centerys) + thisring_maxrad + 1
     
     if len(center_coords_index) > 0:
         center_coords_km = np.transpose(np.vstack([center_coords_index[:, 1] - cutoff_distance, cutoff_distance - center_coords_index[:, 0]]))
@@ -449,7 +483,11 @@ def get_ring_center_coords(ring_center_pixel_arrays, station_str, display_output
     return {"center coords (index)": center_coords_index, 
             "center coords (km)": center_coords_km, 
             "center coords (lat/lon)": center_coords_latlon, 
-            "first scan indices": first_scan_indices}
+            "first scan indices": first_scan_indices,
+            "min xlims": min_xlims,
+            "max xlims": max_xlims,
+            "min ylims": min_ylims,
+            "max ylims": max_ylims}
 
 
 ####################
@@ -921,7 +959,7 @@ def single_filter_sweep(radar_bool_allcorr, radar_bool_lowcorr, max_background_n
     condition2 = signal_ratio >= min_signal
     all_conditions = np.logical_and(condition1, condition2)    
     
-    ring_center_pixels = 1 * all_conditions
+    ring_center_pixels = center_distance * all_conditions
     possible_rings = np.zeros(np.shape(radar_bool_allcorr))
         
     center_is, center_js = np.nonzero(ring_center_pixels)
@@ -959,7 +997,7 @@ def hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, 
     results_mask : array
         Masks out reflectivity not contained in a roost ring
     center_coords : array
-        Coordinates of centers of potential roost rings, in km from radar station
+        Coordinates of centers of potential roost rings, as array indices
     figure_length : float, optional
         Figure size in inches   
         Default: figure_length = 6   
@@ -997,7 +1035,7 @@ def hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, 
     ax[1].imshow(ma.array(radar_array_grid, mask = results_mask), interpolation = 'none', cmap = 'viridis', vmin = -20, vmax = 60)
     
     if len(center_coords) > 0:
-        ax[1].scatter(center_coords[:, 0] + cutoff_distance, cutoff_distance - center_coords[:, 1], c = 'gold', edgecolor = 'k', s = 25, linewidth = 1.75) 
+        ax[1].scatter(center_coords[:, 1], center_coords[:, 0], c = 'gold', edgecolor = 'k', s = 25, linewidth = 1.75) 
     
     ax[1].set_xlabel('Distance (km)', fontsize = 12)
     ax[1].set_ylabel('Distance (km)', fontsize = 12)
@@ -1087,7 +1125,11 @@ def empty_roost_df():
     Returns empty DataFrame with same column names as output when roost rings are found.
     """
     
-    return pd.DataFrame(columns = ['latitude', 'longitude', 'first detection', 'station name', 'year', 'month', 'day', 'scan prefix'])
+    return pd.DataFrame(columns = ['center (latitude)', 'center (longitude)', 'center (array x)', 'center (array y)', 
+                                    'min xlim', 'max xlim', 'min ylim', 'max ylim',
+                                   'first detection', 
+                                   'station name', 'year', 'month', 'day', 'scan prefix', 
+                                   'cutoff_distance', 'min_reflectivity', 'max_background_noise', 'min_signal'])
 
 
 def no_files_that_day(station_str, scan_date):
