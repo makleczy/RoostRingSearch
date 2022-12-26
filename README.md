@@ -99,9 +99,41 @@ morning_df
 
 If everything is set up correctly, you should see something like this:
 
-<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/readme_df.png" width = "700">
+<img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/readme_df.png" width = "800">
 
 RoostRingSearch checked all the available scans from the KDOX radar during a window of time on the morning of August 23, 2020. It found four distinct roost rings and reported the latitude and longitude of the center of each ring, as well as the scan on which each ring was first detected.
+
+The first two columns are the latitude and longitude of the center of the roost ring.
+* `center (latitude)`
+* `center (longitude)`
+
+The next two columns are the coordinates of the center of the roost ring in relation to the array indices (in case you want to plot the ring center over the array).
+* `center (array x)`
+* `center (array y)`
+
+The next four columns are the x and y limits to use to plot the part of the array containing that roost ring. This includes some extra space around the ring.
+* `min xlim`
+* `max xlim`
+* `min ylim`
+* `max ylim`
+
+The next column is the time of the reflectivity scan when the ring was first detected on the given day.
+* `first detection`
+
+The next four columns contain the information to run the `morning_exodus` function.
+* `station name`
+* `year`
+* `month`
+* `day`
+
+The next column contains the scan prefix, which can be used to run the `find_roost_rings` function.
+* `scan prefix`
+
+The last four columns are the parameters used to run the algorithm.
+* `cutoff_distance`
+* `min_reflectivity`
+* `max_background_noise`
+* `min_signal`
 
 Running the `morning_exodus` function like this is great if you just want the final results. If you want to check multiple days and/or stations, you can concatenate the DataFrames and save the results. If you're interested, RoostRingSearch can also display and/or return more information for further investigation. The functions `find_roost_rings` and `morning_exodus` both have the option to select `display_output = True` in order to see more information.
 
