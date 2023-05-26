@@ -209,7 +209,7 @@ We'll discuss how each of these work.
 This parameter controls the region of the original scan which `find_roost_rings` checks for roost rings. The arrays are centered around the radar, and extend `cutoff_distance` km the the left (west), right (east), up (north), and down (south). A roost ring generally can't be identified unless the full circle which would be formed by the ring lies completely within the array. For example, with the default value `cutoff_distance = 150` the roost ring in the lower left corner of the following scan does not appear as a potential roost ring. (As a side note, the following line of code demonstrates an alternate input format for `find_roost_rings`.)
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35)), display_output = True);
+rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35, tzinfo = datetime.timezone.utc)), display_output = True);
 ```
 
 <img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_cutoff_default.png" width = "700">
@@ -217,7 +217,7 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35)), display_ou
 To find that roost ring, increase the default value of `cutoff_distance` to 200:
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35)), display_output = True, 
+rrs.find_roost_rings(('KDOX', datetime.datetime(2019, 8, 6, 10, 35, tzinfo = datetime.timezone.utc)), display_output = True, 
                       cutoff_distance = 200);
 ```
 
@@ -230,7 +230,7 @@ Increasing the `cutoff_distance` creates larger arrays, which can increase the r
 A scan such as this one can have a lot of precipitation, and still have a roost ring.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 4, 9, 41)), display_output = True);
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 4, 9, 41, tzinfo = datetime.timezone.utc)), display_output = True);
 ```
 
 <img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_cutoff_precip.png" width = "700">
@@ -240,7 +240,7 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 4, 9, 41)), display_out
 Recall that one of the preprocessing steps is to screen out low reflectivity. The `min_reflectivity` parameter determines how low reflectivity needs to be in order to be removed from the array. Let's look at an example, starting with the default value of `min_reflectivity = 0`. Reflectivity values can be negative, so that's a nontrivial requirement. `find_roost_rings` only finds one of the roost rings.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20)), display_output = True);
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20, tzinfo = datetime.timezone.utc)), display_output = True);
 ```
 
 <img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minrefl_default.png" width = "700">
@@ -248,7 +248,7 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20)), display_o
 Increasing the `min_reflectivity` to 10 finds two of the other rings instead, because they have higher reflectivity in the ring region and the noisy reflectivity in the background is screened out.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20)), display_output = True, 
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 10, 1, 11, 20, tzinfo = datetime.timezone.utc)), display_output = True, 
                       min_reflectivity = 10);
 ```
 
@@ -261,7 +261,7 @@ Running the function multiple times with different values of `min_reflectivity` 
 Remember the linear filter? A roost ring should not have too much reflectivity in the orange regions. The `max_background_noise` parameter determines how much reflectivity is allowed. In this scan, the roost ring doesn't register with the default `max_background_noise = 0.05` because there is too much reflectivity around it.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_output = True);
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40, tzinfo = datetime.timezone.utc)), display_output = True);
 ```
 
 <img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_background_default.png" width = "700">
@@ -269,7 +269,7 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_out
 `find_roost_rings` is able to find this roost ring when `max_background_noise = 0.15`. Note that increasing the `max_background_noise` makes it easier for a region of a scan to count as a roost ring, so in general there will be more false positives.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_output = True, 
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40, tzinfo = datetime.timezone.utc)), display_output = True, 
                       max_background_noise = 0.15);
 ```
 
@@ -280,7 +280,7 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 8, 7, 9, 40)), display_out
 Finally, the `min_signal` parameter determines how much reflectivity is needed in the blue region of the filter. Here's an example, starting with the default value `min_signal = 0.3`. There is a roost ring, but it doesn't have enough positive reflectivity for `find_roost_rings` to find it.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59)), display_output = True);
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59, tzinfo = datetime.timezone.utc)), display_output = True);
 ```
 
 <img src = "https://github.com/makleczy/RoostRingSearch/blob/main/readme_figures/results_readme_minsignal_default.png" width = "700">
@@ -288,7 +288,7 @@ rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59)), display_ou
 Decreasing the `min_signal` parameter to 0.25 relaxes the requirements enough to find this roost ring. As before, this makes false positive results more likely.
 
 ```
-rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59)), display_output = True, 
+rrs.find_roost_rings(('KDOX', datetime.datetime(2021, 7, 25, 9, 59, tzinfo = datetime.timezone.utc)), display_output = True, 
                       min_signal = 0.25);
 ```
 
