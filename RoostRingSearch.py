@@ -295,7 +295,7 @@ def find_roost_rings(scan_info,
         [year_str, month_str, day_str, station_str, long_str] = scan_info.split('/')
         hour_str = long_str[-4:-2]
         minute_str = long_str[-2:]
-        scan_dt = datetime.datetime(int(year_str), int(month_str), int(day_str), int(hour_str), int(minute_str))
+        scan_dt = datetime.datetime(int(year_str), int(month_str), int(day_str), int(hour_str), int(minute_str), tzinfo = datetime.timezone.utc)
         scan_prefix = scan_info
     else:
         print('Error - incorrect input format')
