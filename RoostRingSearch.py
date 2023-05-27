@@ -228,7 +228,7 @@ def find_roost_rings(scan_info,
                      
              # display options
              display_output = False,
-             figure_length = 6,             
+             figure_length = 2.5,             
              filename_suffix = ''
              ):
     
@@ -258,7 +258,7 @@ def find_roost_rings(scan_info,
         Default: display_output = False
     figure_length : float, optional
         Figure size in inches   
-        Default: figure_length = 6   
+        Default: figure_length = 2.5  
     filename_suffix : string, optional
         String to add to the end of plot filenames, if applicable
         Default: filename_suffix = ''
@@ -360,7 +360,7 @@ def find_roost_rings(scan_info,
 # get coordinates of ring centers
 
 
-def get_ring_center_coords(center_radius_pixel_arrays, station_str, display_output = False, figure_length = 6):    
+def get_ring_center_coords(center_radius_pixel_arrays, station_str, display_output = False, figure_length = 2.5):    
     
     """ We already marked pixels which are likely the center of a roost ring. It is possible that several "center" pixels were identified for a single roost ring. They may not form a single connected component if the shape of that roost ring irregular. So we apply dilation to hopefully form one connected component for the center of each roost ring. We use that to determine a location for each roost ring.
     
@@ -376,7 +376,7 @@ def get_ring_center_coords(center_radius_pixel_arrays, station_str, display_outp
         Default: display_output = False
     figure_length : float, optional
         Figure size in inches if plotting
-        Default: figure_length = 6
+        Default: figure_length = 2.5
         
     Returns
     -------
@@ -1000,7 +1000,6 @@ def hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, 
         Coordinates of centers of potential roost rings, as array indices
     figure_length : float, optional
         Figure size in inches   
-        Default: figure_length = 6   
     filename_suffix : string, optional
         String to add to the end of plot filenames, if applicable
         Default: filename_suffix = ''
@@ -1015,40 +1014,39 @@ def hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, 
     
     original_mask = (radar_array_grid == fill_value)
     original_plot = ax[0].imshow(ma.array(radar_array_grid, mask = original_mask), interpolation = 'none', cmap = 'viridis', vmin = -20, vmax = 60)
-    cbar = plt.colorbar(original_plot, ax = ax[0])
-    cbar.set_label(label = 'Equivalent Reflectivity Factor (dBZ)', fontsize = 12)
-    cbar.ax.tick_params(labelsize = 12)
+    cbar = plt.colorbar(original_plot, ax = ax[1])
+    cbar.set_label(label = 'Equivalent Reflectivity Factor (dBZ)', fontsize = 10)
+    cbar.ax.tick_params(labelsize = 10)
     
-    ax[0].set_xlabel('Distance (km)', fontsize = 12)
-    ax[0].set_ylabel('Distance (km)', fontsize = 12)
-    ax[0].set_title(scan_field_str, fontsize = 12)
+    ax[0].set_xlabel('Distance (km)', fontsize = 10)
+    ax[0].set_ylabel('Distance (km)', fontsize = 10)
+    ax[0].set_title(scan_field_str, fontsize = 10)
     
     original_ticks = [50*i for i in range(1, 2*cutoff_distance//50)]
     new_xticks = [tick - cutoff_distance for tick in original_ticks]
     new_yticks = [cutoff_distance - tick for tick in original_ticks]
     ax[0].set_xticks(original_ticks, labels = new_xticks)
     ax[0].set_yticks(original_ticks, labels = new_yticks)
-    ax[0].tick_params(labelsize = 12)
+    ax[0].tick_params(labelsize = 10)
     
     ### plot the results
     
     ax[1].imshow(ma.array(radar_array_grid, mask = results_mask), interpolation = 'none', cmap = 'viridis', vmin = -20, vmax = 60)
     
     if len(center_coords) > 0:
-        ax[1].scatter(center_coords[:, 1], center_coords[:, 0], c = 'gold', edgecolor = 'k', s = 25, linewidth = 1.75) 
+        ax[1].scatter(center_coords[:, 1], center_coords[:, 0], marker = 'X', s = 30, color = 'k', edgecolor = 'white', lw = 0.75) 
     
-    ax[1].set_xlabel('Distance (km)', fontsize = 12)
-    ax[1].set_ylabel('Distance (km)', fontsize = 12)
+    ax[1].set_xlabel('Distance (km)', fontsize = 10)
     
     results_title = 'Potential Roost Rings'
-    ax[1].set_title(results_title, fontsize = 12)
+    ax[1].set_title(results_title, fontsize = 10)
     
     ax[1].set_xticks(original_ticks, labels = new_xticks)
-    ax[1].set_yticks(original_ticks, labels = new_yticks)
-    ax[1].tick_params(labelsize = 12)
+    ax[1].set_yticks([])
+    ax[1].tick_params(labelsize = 10)
     
-    plt.subplots_adjust(wspace = 0.05)
-    plt.suptitle(title_str, size = 16, y = 1.05)
+    plt.subplots_adjust(wspace = -0.4)
+    plt.suptitle(title_str, size = 12, y = 1.1)
     
     plt.savefig('results' + filename_suffix, bbox_inches = 'tight')
     plt.show()
