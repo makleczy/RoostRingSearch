@@ -1022,7 +1022,16 @@ def hilite_rings_found(title_str, scan_field_str, radar_array_grid, fill_value, 
     ax[0].set_ylabel('Distance (km)', fontsize = 10)
     ax[0].set_title(scan_field_str, fontsize = 10)
     
-    original_ticks = [50*i for i in range(1, 2*cutoff_distance//50)]
+    if cutoff_distance <= 150:
+        tick_spacing = 50
+    else:
+        tick_spacing = 100
+    tick_start = cutoff_distance%tick_spacing
+    if tick_start <= 10: # decide how close you allow ticks to be to the edge of the plot
+        tick_start += tick_spacing
+    n_ticks = 2 * ((cutoff_distance - tick_start) // tick_spacing) + 1
+    original_ticks = [tick_start + tick_spacing*i for i in range(0, n_ticks)]
+    
     new_xticks = [tick - cutoff_distance for tick in original_ticks]
     new_yticks = [cutoff_distance - tick for tick in original_ticks]
     ax[0].set_xticks(original_ticks, labels = new_xticks)
